@@ -1,6 +1,10 @@
-#define BLYNK_PRINT Serial
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
+#define BLYNK_PRINT Serial
+#define VPIN_LED1      V2
+#define VPIN_LED2      V3 
+#define VPIN_LED3      V4
+
 
 // Authorization token from the Blynk App.
 char auth[] = "tt1tcqOkNBXMsMtMlzvRDNGpuZutSImA";
@@ -49,7 +53,12 @@ liquid_graph =analogRead(sensorPin);//Percentage of water in the container
 Serial.println(liquid_level);//This will print the liquid level in the monitor 
 Serial.println(liquid_graph);//This will print the percentage of liquid in the monitor
 Blynk.virtualWrite(V0, liquid_level);
-Blynk.virtualWrite(V1, liquid_graph);
+Blynk.virtualWrite(V1, liquid_graph);    
+
+Blynk.virtualWrite(VPIN_LED1,  led1);
+Blynk.virtualWrite(VPIN_LED2,  led2);
+Blynk.virtualWrite(VPIN_LED3,  led3);
+
 Blynk.run();
 int analogValue = analogRead(sensorPin);
 // if the analog value is high enough, turn on the LED:

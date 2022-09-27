@@ -1,0 +1,105 @@
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+WidgetLED led1(V2);
+WidgetLED led2(V3);
+WidgetLED led3(V4);
+
+char auth[] = "vLX_XKrdLFbWviFFT5d5cpKOr4BG1iKo";
+char ssid[] = "Nabilahatha";
+char pass[] = "Abil1106";
+
+const int sensorPin = A0;
+int liquid_level;
+int panjangsensor=4;
+
+int liquid_levelk;
+
+
+const int LedHijau = D1;
+const int LedKuning = D2;
+const int LedMerah = D3;
+const int BatasBawah = 250;
+const int BatasAtas = 550;
+
+void setup()
+{
+  Serial.begin(115200);
+  Blynk.begin(auth, ssid, pass);
+  pinMode(LedMerah, OUTPUT);
+  pinMode(LedHijau, OUTPUT);
+  pinMode(LedKuning, OUTPUT);
+  // pinMode (Buzzer, OUTPUT);
+  pinMode(sensorPin, INPUT);
+  Blynk.virtualWrite(V0, liquid_level);
+  //Blynk.virtualWrite(V1, liquid_graph); // This wil show the percentage of water in the container in a virtual pin V1
+  Blynk.run();
+  // initialize the LED pin as an output:
+  pinMode(LedMerah, OUTPUT);
+  pinMode(LedHijau, OUTPUT);
+  pinMode(LedKuning, OUTPUT);
+  // pinMode (Buzzer, OUTPUT);
+  //  initialize serial communications:
+}
+
+void loop()
+{
+  // read the value of the potentiometer:
+  liquid_levelk = analogRead(sensorPin);
+  liquid_level= (liquid_levelk*panjangsensor)/1024;
+  //liquid_graph = analogRead(sensorPin); // Percentage of water in the container
+  Serial.println("liquid_level :");         // This will print the liquid level in the monitor
+  Serial.print(liquid_level);         // This will print the liquid level in the monitor
+  Serial.println(" cm "); 
+  //Serial.println("liquid_graph :");         // This will print the percentage of liquid in the monitor
+  //Serial.println(liquid_graph);         // This will print the percentage of liquid in the monitor
+  Blynk.virtualWrite(V0, liquid_level);
+  //Blynk.virtualWrite(V1, liquid_graph);
+
+  Blynk.run();
+  int analogValue = analogRead(sensorPin);
+
+  // if the analog value is high enough, turn on the LED:
+  if (analogValue < BatasBawah)
+  {
+    led1.on();
+    digitalWrite(LedHijau, HIGH);
+    Blynk.notify ("SUNGAI DALAM KONDISI AMAN");
+  }
+  else
+  {
+    led1.off();
+    digitalWrite(LedHijau, LOW);
+  }
+
+  if (analogValue > BatasBawah && analogValue < BatasAtas)
+  {
+    led2.on();
+    digitalWrite(LedKuning, HIGH);
+    Blynk.notify ("SIAGA, AIR SUDAH MULAI MELUAP");
+  }
+  else
+  {
+    led2.off();
+    digitalWrite(LedKuning, LOW);
+  }
+
+  if (analogValue > BatasAtas)
+  {
+    led2.off();
+    led3.on();
+    Blynk.notify ("BAHAYA !!! AIR TERLALU TINGGI BERESIKO BANJIR");
+    digitalWrite(LedKuning, LOW);
+    digitalWrite(LedMerah, HIGH);
+    // digitalWrite(Buzzer , HIGH);
+  }
+  else
+  {
+    led3.off();
+    digitalWrite(LedMerah, LOW);
+    // digitalWrite(Buzzer , LOW);
+  }
+  // print the analog value:
+  //Serial.println(analogValue);
+  delay(1000); // delay in between reads for stability
+}
